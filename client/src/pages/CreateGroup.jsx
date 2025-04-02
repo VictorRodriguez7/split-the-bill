@@ -43,7 +43,16 @@ export default function CreateGroup() {
   return (
     <div className="max-w-xl mx-auto mt-10">
       <h2 className="text-2xl font-semibold mb-6">Create a New Group</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') {
+         e.preventDefault();
+         const form = e.target.form;
+         const index = Array.prototype.indexOf.call(form, e.target);
+         form.elements[index + 1]?.focus();
+        } 
+        }}
+      className="space-y-4">
         <div>
           <label className="block font-medium">Group Name</label>
           <input
@@ -87,12 +96,16 @@ export default function CreateGroup() {
         </div>
 
         <div className="flex gap-4">
-          <button
-            type="submit"
-            className="bg-yellow-300 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded"
-          >
-            Create Group
-          </button>
+        <button
+          type="submit"
+          style={{ backgroundColor: '#F8DFA2' }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = '#f1ce73')}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = '#F8DFA2')}
+          className="text-black font-semibold px-4 py-2 rounded shadow transition-colors duration-150"
+        >
+          Create
+        </button>
+
             
           <button
             type="button"
