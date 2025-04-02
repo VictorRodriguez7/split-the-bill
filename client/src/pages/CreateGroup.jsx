@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../api';
 
 export default function CreateGroup() {
   const [groupName, setGroupName] = useState('');
@@ -22,18 +23,21 @@ export default function CreateGroup() {
     setMembers(newMembers);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newGroup = {
-      name: groupName,
-      members: members.filter((m) => m.trim() !== '')
-    };
+    try {
+      const res = await api.post('/groups', {
+        name: groupName,
+        members: members.filter((m) => m.trim() !== ''),
+      });
 
-    console.log('Group created:', newGroup);
+      console.log('Group created:', res.data);
 
-    // Redirect back to landing page (for now)
-    navigate('/');
+      navigate('/'); // back to home
+    } catch (err) {
+      console.error('Error creating group:', err);
+    }
   };
 
   return (
@@ -82,12 +86,23 @@ export default function CreateGroup() {
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="bg-yellow-300 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded"
-        >
-          Create Group
-        </button>
+        <div className="flex gap-4">
+          <button
+            type="submit"
+            className="bg-yellow-300 hover:bg-yellow-400 text-black font-semibold py-2 px-4 rounded"
+          >
+            Create Group
+          </button>
+            
+          <button
+            type="button"
+            onClick={() => navigate('/')}
+            className="bg-gray-200 hover:bg-gray-300 text-black font-medium py-2 px-4 rounded"
+          >
+            Cancel
+          </button>
+        </div>
+
       </form>
     </div>
   );

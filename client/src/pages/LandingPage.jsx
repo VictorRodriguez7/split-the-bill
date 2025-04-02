@@ -1,11 +1,23 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-
-const dummyGroups = [
-  { id: '1', name: 'Roommates' },
-  { id: '2', name: 'Denver Trip' },
-];
+import api from '../api';
 
 export default function LandingPage() {
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      try {
+        const res = await api.get('/groups');
+        setGroups(res.data);
+      } catch (err) {
+        console.error('Failed to fetch groups:', err);
+      }
+    };
+
+    fetchGroups();
+  }, []);
+
   return (
     <div className="max-w-xl mx-auto mt-10">
       <h1 className="text-3xl font-bold mb-6">Split the Bill</h1>
@@ -18,7 +30,7 @@ export default function LandingPage() {
       </Link>
 
       <div className="space-y-4">
-        {dummyGroups.map((group) => (
+        {groups.map((group) => (
           <Link
             key={group.id}
             to={`/groups/${group.id}`}

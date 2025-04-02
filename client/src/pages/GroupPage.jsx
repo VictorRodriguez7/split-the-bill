@@ -1,33 +1,25 @@
-import { useParams, Link } from 'react-router-dom';
-import { jsPDF } from 'jspdf'; // For PDF export
-
-const dummyGroups = [
-  {
-    id: '1',
-    name: 'Roommates',
-    members: ['Victor', 'Jeremiah', 'Johnny'],
-    expenses: [
-      {
-        id: 'exp1',
-        title: 'Groceries',
-        amount: 60,
-        paidBy: 'Victor',
-        splitWith: ['Victor', 'Jeremiah', 'Johnny']
-      },
-      {
-        id: 'exp2',
-        title: 'Pizza Night',
-        amount: 40,
-        paidBy: 'Jeremiah',
-        splitWith: ['Jeremiah', 'Johnny']
-      }
-    ]
-  }
-];
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { jsPDF } from 'jspdf';
+import api from '../api';
 
 export default function GroupPage() {
   const { id } = useParams();
-  const group = dummyGroups.find((g) => g.id === id);
+  const navigate = useNavigate();
+  const [group, setGroup] = useState(null);
+
+  useEffect(() => {
+    const fetchGroup = async () => {
+      try {
+        const res = await api.get(`/groups/${id}`);
+        setGroup(res.data);
+      } catch (err) {
+        console.error('Failed to fetch group:', err);
+      }
+    };
+
+    fetchGroup();
+  }, [id]);
 
   const handleExport = () => {
     const doc = new jsPDF();
@@ -47,6 +39,18 @@ export default function GroupPage() {
     doc.save(`${group.name}-expenses.pdf`);
   };
 
+  const handleDeleteGroup = async () => {
+    const confirmed = confirm('Are you sure you want to delete this group?');
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/groups/${group.id}`);
+      navigate('/');
+    } catch (err) {
+      console.error('Error deleting group:', err);
+    }
+  };
+
   if (!group) {
     return <div className="text-center mt-10 text-gray-600">Group not found.</div>;
   }
@@ -56,7 +60,7 @@ export default function GroupPage() {
       <h1 className="text-3xl font-bold mb-2">{group.name}</h1>
       <p className="text-gray-600 mb-6">Members: {group.members.join(', ')}</p>
 
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-4 mb-6">
         <Link
           to={`/groups/${group.id}/add`}
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -69,6 +73,13 @@ export default function GroupPage() {
           className="bg-green-500 text-white px-4 py-2 rounded"
         >
           Export Expenses
+        </button>
+
+        <button
+          onClick={handleDeleteGroup}
+          className="bg-red-500 text-white px-4 py-2 rounded"
+        >
+          Delete Group
         </button>
       </div>
 
@@ -92,9 +103,8 @@ export default function GroupPage() {
                     <div key={person} className="flex items-center gap-2">
                       <input type="checkbox" disabled />
                       <span>
-                        {person} owes ${(
-                          expense.amount / expense.splitWith.length
-                        ).toFixed(2)}{' '}
+                        {person} owes $
+                        {(expense.amount / expense.splitWith.length).toFixed(2)}{' '}
                         to {expense.paidBy}
                       </span>
                     </div>
