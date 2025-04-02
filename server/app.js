@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
+const groupRoutes = require('./routes/groups');
+const expenseRoutes = require('./routes/expenses');
 
 const app = express();
-app.use(cors()); // Allow requests from frontend
-app.use(express.json()); // Enable JSON parsing
+app.use(cors());
+app.use(express.json());
+
+app.use('/groups', groupRoutes); // Mount /groups
+app.use('/expenses', expenseRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');
