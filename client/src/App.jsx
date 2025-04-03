@@ -10,7 +10,6 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen p-6">
       <Header />
-
       <div className="flex-1">
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -19,7 +18,6 @@ function App() {
           <Route path="/groups/:id/add" element={<AddExpense />} />
         </Routes>
       </div>
-
       <Footer />
     </div>
   );

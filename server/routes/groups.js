@@ -2,9 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { groups } = require('../data');
 
-// GET /groups - list all groups
+// GET /groups - list all groups created by the current user
 router.get('/', (req, res) => {
-  res.json(groups);
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required' });
+  }
+
+  const userGroups = groups.filter(group => group.createdBy === userId);
+  res.json(userGroups);
 });
 
 // GET /groups/:id - get a specific group by ID
@@ -18,16 +25,21 @@ router.get('/:id', (req, res) => {
 
   res.json(group);
 });
-  
+
 // POST /groups - create a new group
 router.post('/', (req, res) => {
-  const { name, members } = req.body;
+  const { name, members, userId } = req.body;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required' });
+  }
 
   const newGroup = {
-    id: Date.now().toString(), // simple ID
+    id: Date.now().toString(),
     name,
     members,
-    expenses: []
+    expenses: [],
+    createdBy: userId
   };
 
   groups.push(newGroup);

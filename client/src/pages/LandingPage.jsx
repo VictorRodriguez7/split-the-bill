@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api';
+import getUserId from '../utils/getUserId'; // ⬅️ import helper
 
 export default function LandingPage() {
   const [groups, setGroups] = useState([]);
@@ -10,7 +11,10 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const res = await api.get('/groups');
+        const userId = getUserId(); // ⬅️ grab local user id
+        const res = await api.get('/groups', {
+          params: { userId }
+        });
         setGroups(res.data);
       } catch (err) {
         console.error('Failed to fetch groups:', err);
@@ -35,7 +39,7 @@ export default function LandingPage() {
     <div className="max-w-xl mx-auto mt-10">
       <h1 className="text-3xl font-bold mb-4">Split the Bill</h1>
       <p className="text-gray-600 mb-6">
-      No more awkward texts or forgotten IOUs — Split the Bill makes tracking group expenses easy, fair, and kinda fun.
+        No more awkward texts or forgotten IOUs — Split the Bill makes tracking group expenses easy, fair, and kinda fun.
       </p>
 
       <Link
@@ -45,9 +49,8 @@ export default function LandingPage() {
         onMouseLeave={(e) => (e.target.style.backgroundColor = '#F8DFA2')}
         className="text-black font-semibold px-4 py-2 rounded shadow mb-8 inline-block transition-colors duration-150"
       >
-      + Create Group
+        + Create Group
       </Link>
-
 
       <hr className="mt-0 my-6" />
 
@@ -59,23 +62,21 @@ export default function LandingPage() {
         <div className="space-y-4">
           {groups.map((group) => (
             <Link
-            key={group.id}
-            to={`/groups/${group.id}`}
-            style={{
-              backgroundColor: 'rgba(129, 165, 197, 0.8)',
-              color: '#2D3640'
-            }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = '#6f94b9')}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = '#81A5C5')}
-            className="block py-8 px-6 rounded shadow-sm font-semibold text-lg text-white transition-colors duration-150"
-          >
-            {group.name}
-          </Link>
-          
+              key={group.id}
+              to={`/groups/${group.id}`}
+              style={{
+                backgroundColor: 'rgba(129, 165, 197, 0.8)',
+                color: '#2D3640'
+              }}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = '#6f94b9')}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = '#81A5C5')}
+              className="block py-8 px-6 rounded shadow-sm font-semibold text-lg text-white transition-colors duration-150"
+            >
+              {group.name}
+            </Link>
           ))}
         </div>
       )}
     </div>
-
   );
 }
