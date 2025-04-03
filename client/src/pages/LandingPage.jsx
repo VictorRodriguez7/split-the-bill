@@ -11,10 +11,9 @@ export default function LandingPage() {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const userId = getUserId(); // ⬅️ grab local user id
-        const res = await api.get('/groups', {
-          params: { userId }
-        });
+        const userId = getUserId();
+        const res = await api.get(`/groups?userId=${userId}`);
+
         setGroups(res.data);
       } catch (err) {
         console.error('Failed to fetch groups:', err);
